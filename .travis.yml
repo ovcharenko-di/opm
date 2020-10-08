@@ -5,10 +5,10 @@ notifications:
   email: false
 env:
   global:
-  - CHANNEL=dev
   - PACKAGE_NAME=opm
+  - OSCRIPT_VERSION_DOT=1.3.0
   matrix:
-  - OSCRIPT_VERSION=1_0_21
+  - OSCRIPT_VERSION=1_3_0
   - OSCRIPT_VERSION=night-build
 matrix:
   allow_failures:
@@ -34,12 +34,13 @@ before_cache:
     | xargs -n 2 -t sh -c 'test -e $HOME/docker/$1.tar.gz || docker save $0 | gzip -2 > $HOME/docker/$1.tar.gz'
 
 install: 
-    - docker pull evilbeaver/onescript:1.0.21
+    - docker pull evilbeaver/onescript:$OSCRIPT_VERSION_DOT
 
 script:  
   - docker version
-  - docker run -it -e OSCRIPT_VERSION=$OSCRIPT_VERSION -v $(pwd):/work_dir evilbeaver/onescript:1.0.20 sh -c 'cd /work_dir; sh /work_dir/travis-ci.sh; exit' | tee /tmp/test.log
+  - docker run -it -e OSCRIPT_VERSION=$OSCRIPT_VERSION -v $(pwd):/work_dir evilbeaver/onescript:1.2.0 sh -c 'cd /work_dir; sh /work_dir/travis-ci.sh; exit' | tee /tmp/test.log
   - grep 'Результат прогона тестов <Да>' /tmp/test.log
+  - grep 'Результат прогона основных фич <Да>' /tmp/test.log
 after_success:
  # - bash <(curl -s https://codecov.io/bash)
   - ./sonar-qube.sh
@@ -54,7 +55,7 @@ jobs:
     - stage: Сборка и публикация github & hub.oscript.io
       script: skip 
       before_deploy:
-        - docker run -it -v $(pwd):/work_dir evilbeaver/onescript:1.0.21 sh -c 'cd /work_dir; opm build ./ ; exit'
+        - docker run -it -v $(pwd):/work_dir evilbeaver/onescript:$OSCRIPT_VERSION_DOT sh -c 'cd /work_dir; opm build ./ ; exit'
       deploy:
         - provider: releases
           api_key: "$GITHUB_OAUTH_TOKEN"
@@ -66,12 +67,12 @@ jobs:
             tags: true
         - provider: script
           skip_cleanup: true
-          script: docker run -it -e GITHUB_OAUTH_TOKEN=$GITHUB_OAUTH_TOKEN -v $(pwd):/work_dir evilbeaver/onescript:1.0.21 sh -c 'cd /work_dir; opm push --token $GITHUB_OAUTH_TOKEN --channel dev --file ./$PACKAGE_NAME-*.ospx; exit'
+          script: docker run -it -e GITHUB_OAUTH_TOKEN=$GITHUB_OAUTH_TOKEN -v $(pwd):/work_dir evilbeaver/onescript:$OSCRIPT_VERSION_DOT sh -c 'cd /work_dir; opm push --token $GITHUB_OAUTH_TOKEN --channel dev --file ./$PACKAGE_NAME-*.ospx; exit'
           on:
             branch: develop
         - provider: script
           skip_cleanup: true
-          script: docker run -it -e GITHUB_OAUTH_TOKEN=$GITHUB_OAUTH_TOKEN -v $(pwd):/work_dir evilbeaver/onescript:1.0.21 sh -c 'cd /work_dir; opm push --token $GITHUB_OAUTH_TOKEN --channel stable --file ./$PACKAGE_NAME-*.ospx; exit'
+          script: docker run -it -e GITHUB_OAUTH_TOKEN=$GITHUB_OAUTH_TOKEN -v $(pwd):/work_dir evilbeaver/onescript:$OSCRIPT_VERSION_DOT sh -c 'cd /work_dir; opm push --token $GITHUB_OAUTH_TOKEN --channel stable --file ./$PACKAGE_NAME-*.ospx; exit'
           on:
             branch: master
             tags: true
