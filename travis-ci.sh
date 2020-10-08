@@ -10,6 +10,7 @@ rm -f oscript.deb
 apt-get update
 apt-get install -y python3
 
+opm update opm
 opm install 1testrunner; 
 opm install 1bdd; 
 opm install notify;
