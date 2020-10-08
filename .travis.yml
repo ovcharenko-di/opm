@@ -6,9 +6,9 @@ notifications:
 env:
   global:
   - PACKAGE_NAME=opm
-  - OSCRIPT_VERSION_DOT=1.3.0
+  - OSCRIPT_VERSION_DOT=1.4.0
   matrix:
-  - OSCRIPT_VERSION=1_3_0
+  - OSCRIPT_VERSION=1_4_0
   - OSCRIPT_VERSION=night-build
 matrix:
   allow_failures:
@@ -18,7 +18,7 @@ services:
   - docker
 
 addons:
-    sonarqube: true
+    sonarcloud: true
   
 jdk:
   - oraclejdk8
