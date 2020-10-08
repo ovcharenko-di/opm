@@ -7,7 +7,7 @@ env:
   global:
   - PACKAGE_NAME=opm
   - OSCRIPT_VERSION_DOT=1.4.0
-  - LANG=C.UTF-8
+  - LC_ALL=C.UTF-8
   matrix:
   - OSCRIPT_VERSION=1_4_0
   - OSCRIPT_VERSION=night-build
